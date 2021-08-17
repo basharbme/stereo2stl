@@ -261,7 +261,7 @@ waitbar(0.5, loadingWaitbar);
 ![Figure 2 - Reprojection Error](./images/reprojection-errors.png)
 
 8. Rectify the images using "valid" output view.<br>
-   The "valid" option is most suitable for computing disparity.<sup>[\[3\]][mathworks-help-rectifystereoimages]<br>
+   The "valid" option is most suitable for computing disparity. [\[3\]][mathworks-help-rectifystereoimages]<br>
    - **Parameters:**
      - `OutputView`: OutputView crops the image to a rectangle, fitting inside the overlapping, curved 3D anaglyph. Default: `valid`.
 
