@@ -132,7 +132,7 @@ Code based on MATLAB `rectifyStereoImages` code sample. [\[1\]][mathworks-help-r
 1. Delete STL if it exists.
 
 ```matlab
-if exist(fullfile(filePath, stlPath))
+if exist(fullfile(filePath, stlPath), "file")
    recycle on;
    delete(fullfile(filePath, stlPath));
 end
@@ -276,7 +276,7 @@ waitbar(0.6, loadingWaitbar);
 ```matlab
 figure;
 imshow(stereoAnaglyph(F1, F2));
-title 'Rectified Image';
+title "Rectified Image";
 waitbar(0.7, loadingWaitbar);
 ```
 
@@ -291,7 +291,7 @@ Code based on MATLAB `disparitySGM` code sample. [\[4\]][mathworks-help-disparit
 1. Compute disparity map from stereo images (colormap of depth).
 
 ```matlab
-disparityMap = disparitySGM(F1, F2, 'DisparityRange', [0, 80]);
+disparityMap = disparitySGM(F1, F2, "DisparityRange", [0, 80]);
 waitbar(0.8, loadingWaitbar);
 ```
 
@@ -302,7 +302,7 @@ waitbar(0.8, loadingWaitbar);
 figure;
 imshow(disparityMap, [0, 80]);
 colormap jet;
-title 'Disparity Map';
+title "Disparity Map";
 colorbar;
 waitbar(0.9, loadingWaitbar);
 ```
@@ -435,19 +435,19 @@ ptCloud = pointCloud(points3D);
 ```matlab
 figure;
 figure3D = pcshow(ptCloud, "VerticalAxis", "y", "VerticalAxisDir", "down");
-title '\color{black} Point Cloud';
+title "\color{black} Point Cloud";
 movegui(figure3D, "center");
 figure3D.OuterPosition = [0 0 1 1];
 
-xlabel 'x (horizontal displacement in m)';
-ylabel 'y (vertical displacement in m)';
-zlabel 'z (point depth in m)';
+xlabel "x (horizontal displacement in m)";
+ylabel "y (vertical displacement in m)";
+zlabel "z (point depth in m)";
 
 view(0, -90);
-set(gcf, 'Color', 'w');
-set(gca, 'XColor', 'k');
-set(gca, 'YColor', 'k');
-set(gca, 'ZColor', 'k');
+set(gcf, "Color", "w");
+set(gca, "XColor", "k");
+set(gca, "YColor", "k");
+set(gca, "ZColor", "k");
 
 colormap(flipud(jet));
 caxis(zlim(figure3D));

@@ -103,7 +103,7 @@ sGolayFiltFrameLen = 9;
 
 %%
 %  Delete STL if it exists.
-if exist(fullfile(filePath, stlPath))
+if exist(fullfile(filePath, stlPath), "file")
     recycle on;
     delete(fullfile(filePath, stlPath));
 end
@@ -228,7 +228,7 @@ waitbar(0.6, loadingWaitbar);
 %  Figure 3 - stereo anaglyph.
 figure;
 imshow(stereoAnaglyph(F1, F2));
-title 'Rectified Image';
+title "Rectified Image";
 waitbar(0.7, loadingWaitbar);
 
 %> =======================================================================
@@ -238,7 +238,7 @@ waitbar(0.7, loadingWaitbar);
 
 %%
 %  Compute disparity map from stereo images (colormap of depth).
-disparityMap = disparitySGM(F1, F2, 'DisparityRange', [0, 80]);
+disparityMap = disparitySGM(F1, F2, "DisparityRange", [0, 80]);
 waitbar(0.8, loadingWaitbar);
 
 %%
@@ -247,7 +247,7 @@ waitbar(0.8, loadingWaitbar);
 figure;
 imshow(disparityMap, [0, 80]);
 colormap jet;
-title 'Disparity Map';
+title "Disparity Map";
 colorbar;
 waitbar(0.9, loadingWaitbar);
 
@@ -364,19 +364,19 @@ ptCloud = pointCloud(points3D);
 %  Figure 5 - scattered point cloud.
 figure;
 figure3D = pcshow(ptCloud, "VerticalAxis", "y", "VerticalAxisDir", "down");
-title '\color{black} Point Cloud';
+title "\color{black} Point Cloud";
 movegui(figure3D, "center");
 figure3D.OuterPosition = [0 0 1 1];
 
-xlabel 'x (horizontal displacement in m)';
-ylabel 'y (vertical displacement in m)';
-zlabel 'z (point depth in m)';
+xlabel "x (horizontal displacement in m)";
+ylabel "y (vertical displacement in m)";
+zlabel "z (point depth in m)";
 
 view(0, -90);
-set(gcf, 'Color', 'w');
-set(gca, 'XColor', 'k');
-set(gca, 'YColor', 'k');
-set(gca, 'ZColor', 'k');
+set(gcf, "Color", "w");
+set(gca, "XColor", "k");
+set(gca, "YColor", "k");
+set(gca, "ZColor", "k");
 
 colormap(flipud(jet));
 caxis(zlim(figure3D));

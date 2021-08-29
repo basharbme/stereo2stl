@@ -137,7 +137,7 @@ if ~isnan(answer{5}); sGolayFiltFrameLen = str2double(answer{5}); end
 
 %%
 %  Delete STL if it exists.
-if exist(fullfile(filePath, stlPath))
+if exist(fullfile(filePath, stlPath), "file")
     recycle on;
     delete(fullfile(filePath, stlPath));
 end
@@ -261,7 +261,7 @@ waitbar(0.6, loadingWaitbar);
 %  Display an anaglyph image for "valid" output view.
 A3 = subplot(2, 2, 3);
 imshow(stereoAnaglyph(F1, F2));
-title 'Rectified Image';
+title "Rectified Image";
 waitbar(0.7, loadingWaitbar);
 
 %> =======================================================================
@@ -280,7 +280,7 @@ waitbar(0.8, loadingWaitbar);
 A4 = subplot(2, 2, 4);
 imshow(disparityMap, [0, 80]);
 colormap(A4, jet);
-title 'Disparity Map';
+title "Disparity Map";
 colorbar(A4);
 waitbar(0.9, loadingWaitbar);
 
@@ -308,7 +308,7 @@ end
 clearvars p k;
 
 %%
-%  Compute checkerboard position as a point cloud. It's the
+%  Compute checkerboard position as a point cloud. It"s the
 %  closest set of co-ordinates to the origin in the z-axis.
 %
 %  @todo See if I need to change `min` in some way (assumes convex).
@@ -397,19 +397,19 @@ ptCloud = pointCloud(points3D);
 %  Figure 5 - scattered point cloud.
 figure;
 figure3D = pcshow(ptCloud, "VerticalAxis", "y", "VerticalAxisDir", "down");
-title '\color{black} Point Cloud';
+title "\color{black} Point Cloud";
 movegui(figure3D, "center");
 figure3D.OuterPosition = [0 0 1 1];
 
-xlabel 'x (horizontal displacement in m)';
-ylabel 'y (vertical displacement in m)';
-zlabel 'z (point depth in m)';
+xlabel "x (horizontal displacement in m)";
+ylabel "y (vertical displacement in m)";
+zlabel "z (point depth in m)";
 
 view(0, -90);
-set(gcf, 'Color', 'w');
-set(gca, 'XColor', 'k');
-set(gca, 'YColor', 'k');
-set(gca, 'ZColor', 'k');
+set(gcf, "Color", "w");
+set(gca, "XColor", "k");
+set(gca, "YColor", "k");
+set(gca, "ZColor", "k");
 
 colormap(flipud(jet));
 caxis(zlim(figure3D));
