@@ -53,8 +53,8 @@ clc;
 %%
 %  Show loading indicator.
 %  Script takes T = ~30s to execute.
-loadingWaitbar = waitbar(0, "Loading");
-loadingWaitbar.Visible = "on";
+loadingWaitbar = waitbar(0, 'Loading');
+loadingWaitbar.Visible = 'on';
 
 %> =======================================================================
 %% Script variable configuration.
@@ -62,15 +62,15 @@ loadingWaitbar.Visible = "on";
 
 %%
 %  Load surf2stl if not installed.
-if ~exist("surf2stl", "file")
-    if ~matlab.addons.isAddonEnabled("mpm")
-        error([                                                             ...
-            "Please install MPM as a MATLAB Addon.\n"                       ...
-            "<a href="""                                                    ...
-            "https://uk.mathworks.com/matlabcentral/fileexchange/54548"     ...
-            """>"                                                           ...
-            "mpm - File Exchange - MATLAB Central"                          ...
-            "</a>"                                                          ...
+if ~exist('surf2stl', 'file')
+    if ~matlab.addons.isAddonEnabled('mpm')
+        error([                                                         ...
+            'Please install MPM as a MATLAB Addon.\n'                   ...
+            '<a href="'                                                 ...
+            'https://uk.mathworks.com/matlabcentral/fileexchange/54548' ...
+            '">'                                                        ...
+            'mpm - File Exchange - MATLAB Central'                      ...
+            '</a>'                                                      ...
         ])
     else
         mpm install surf2stl;
@@ -82,16 +82,14 @@ end
 %> @var filePath path to current folder.
 %> @var stlPath name of point cloud STL.
 %> @var imageMinimum min. no of images in calib folder.
-%> @var approxImageHeight Estimate of furthest scene height in mm.
-%> @var squareWidth Checkerboard square width in mm.
-%> @var ptCloudDensity Point density within squareWidth.
+%> @var squareWidthMm Checkerboard square width in mm.
+%> @var ptCloudDensity Point density within squareWidthMm.
 %> @var sGolayFiltOrder Savitsky-Golay extrapolation curve order.
 %> @var sGolayFiltFrameLen Savitsky-Golay sliding window point count.
 filePath = pwd;
-stlPath = "point-cloud.stl";
+stlPath = 'point-cloud.stl';
 imageMinimum = 3;
-approxImageHeight = 2000;
-squareWidth = 50;
+squareWidthMm = 50;
 ptCloudDensity = 5;
 sGolayFiltOrder = 2;
 sGolayFiltFrameLen = 9;
@@ -103,7 +101,7 @@ sGolayFiltFrameLen = 9;
 
 %%
 %  Delete STL if it exists.
-if exist(fullfile(filePath, stlPath), "file")
+if exist(fullfile(filePath, stlPath), 'file')
     recycle on;
     delete(fullfile(filePath, stlPath));
 end
@@ -114,9 +112,9 @@ end
 %> @var calibLeftImages Images from `./calibration/left` subfolder.
 %> @var calibRightImages Images from `./calibration/right` subfolder.
 %> @see #image-inputs
-inputImages = imageDatastore(fullfile(filePath, "input"));
-calibLeftImages = imageDatastore(fullfile(filePath, "calibration", "left"));
-calibRightImages = imageDatastore(fullfile(filePath, "calibration", "right"));
+inputImages = imageDatastore(fullfile(filePath, 'input'));
+calibLeftImages = imageDatastore(fullfile(filePath, 'calibration', 'left'));
+calibRightImages = imageDatastore(fullfile(filePath, 'calibration', 'right'));
 waitbar(0.1, loadingWaitbar);
 
 %%
@@ -130,7 +128,7 @@ waitbar(0.2, loadingWaitbar);
 
 %%
 %  Calculate undistorted, real-world coordinates of checkerboard keypoints.
-worldPoints = generateCheckerboardPoints(boardSize, squareWidth);
+worldPoints = generateCheckerboardPoints(boardSize, squareWidthMm);
 
 %%
 %  Read input images into MATLAB, and convert to grayscale.
@@ -160,7 +158,7 @@ imageAmounts.R = size(calibRightImages.Files, 1);
 if imageAmounts.L ~= imageAmounts.R      % error #1
 
     e = sprintf(                                                        ...
-        "stereo2stl::ERR_MISMATCH_IMG_COUNT (L: %d, R: %d)",            ...
+        'stereo2stl::ERR_MISMATCH_IMG_COUNT (L: %d, R: %d)',            ...
         imageAmounts.L, imageAmounts.R                                  ...
     );
     errordlg(e);
@@ -168,14 +166,14 @@ if imageAmounts.L ~= imageAmounts.R      % error #1
 
 elseif imageAmounts.L < imageMinimum    % error #2
 
-    e = sprintf("stereo2stl::ERR_CALIB_IMG_INSUFFICIENT (%d)", imageAmounts.L);
+    e = sprintf('stereo2stl::ERR_CALIB_IMG_INSUFFICIENT (%d)', imageAmounts.L);
     errordlg(e);
     error(e);
 
 elseif ~isequal(imageSize, imageSize2)   % error #3
 
     e = sprintf(                                                            ...
-        "stereo2stl::ERR_MISMATCH_IMG_DIM (L: %dx%dpx, R: %dx%dpx)",    ...
+        'stereo2stl::ERR_MISMATCH_IMG_DIM (L: %dx%dpx, R: %dx%dpx)',    ...
         imageSize(1), imageSize(2), imageSize2(1), imageSize2(2)        ...
     );
     errordlg(e);
@@ -196,8 +194,8 @@ end
 %>         stage.
 [stereoParams, ~, estimationErrors] = estimateCameraParameters(         ...
     imagePoints, worldPoints,                                           ...
-    "EstimateSkew", true,                                               ...
-    "EstimateTangentialDistortion", true                                ...
+    'EstimateSkew', true,                                               ...
+    'EstimateTangentialDistortion', true                                ...
 );
 waitbar(0.3, loadingWaitbar);
 
@@ -208,7 +206,7 @@ waitbar(0.3, loadingWaitbar);
 %  camera image. Most camera images have distortion (e.g. "fisheye" lens
 %  effect).
 figure;
-showExtrinsics(stereoParams, "CameraCentric");
+showExtrinsics(stereoParams, 'CameraCentric');
 waitbar(0.4, loadingWaitbar);
 figure;
 showReprojectionErrors(stereoParams);
@@ -220,7 +218,14 @@ waitbar(0.5, loadingWaitbar);
 %> The "valid" option is most suitable for computing disparity. [3]
 %> @param OutputView crops the image to a rectangle, fitting inside the
 %>        overlapping, curved 3D anaglyph. Default: `valid`.
-[F1, F2] = rectifyStereoImages(I1, I2, stereoParams, "OutputView", "valid");
+[F1, F2] = rectifyStereoImages(I1, I2, stereoParams, 'OutputView', 'valid');
+pixelDensityMm = mean(                                                  ...
+    [                                                                   ...
+        stereoParams.CameraParameters1.IntrinsicMatrix(2, 1),           ...
+        stereoParams.CameraParameters2.IntrinsicMatrix(2, 1)            ...
+    ], 2                                                                ...
+);
+approxImageHeight = 0.5 * mean(size(F1, 2)) / pixelDensityMm;
 waitbar(0.6, loadingWaitbar);
 
 %%
@@ -228,7 +233,7 @@ waitbar(0.6, loadingWaitbar);
 %  Figure 3 - stereo anaglyph.
 figure;
 imshow(stereoAnaglyph(F1, F2));
-title "Rectified Image";
+title 'Rectified Image';
 waitbar(0.7, loadingWaitbar);
 
 %> =======================================================================
@@ -238,7 +243,7 @@ waitbar(0.7, loadingWaitbar);
 
 %%
 %  Compute disparity map from stereo images (colormap of depth).
-disparityMap = disparitySGM(F1, F2, "DisparityRange", [0, 80]);
+disparityMap = disparitySGM(F1, F2, 'DisparityRange', [0, 80]);
 waitbar(0.8, loadingWaitbar);
 
 %%
@@ -247,7 +252,7 @@ waitbar(0.8, loadingWaitbar);
 figure;
 imshow(disparityMap, [0, 80]);
 colormap jet;
-title "Disparity Map";
+title 'Disparity Map';
 colorbar;
 waitbar(0.9, loadingWaitbar);
 
@@ -266,7 +271,7 @@ rawPoints3D = double(rawPoints3D) ./ 1000;
 %%
 %  Initialise axial, co-ordinate cache for point cloud.
 pointsCache = struct;
-axesKeys = ["X", "Y", "Z"];
+axesKeys = ['X', 'Y', 'Z'];
 for i = 1:3
     k = char(axesKeys(i));
     p = rawPoints3D(:, :, i);
@@ -334,9 +339,9 @@ clearvars k p;
 %>  # Savitzky-Golay filter used to denoise points in Z axis.
 %>
 %> @see https://commons.wikimedia.org/wiki/File:Lissage_sg3_anim.gif
-gs = (1 / ptCloudDensity) * (squareWidth / 1000);
+gs = (1 / ptCloudDensity) * (squareWidthMm / 1000);
 
-I = scatteredInterpolant(pointsCache.X(:), pointsCache.Y(:), pointsCache.Z(:), "natural");
+I = scatteredInterpolant(pointsCache.X(:), pointsCache.Y(:), pointsCache.Z(:), 'natural');
 
 gridPoints = struct;
 intX = min(pointsCache.X(:)):gs:max(pointsCache.X(:));
@@ -363,20 +368,20 @@ ptCloud = pointCloud(points3D);
 %  Launch rotatable, 3D point cloud viewer.
 %  Figure 5 - scattered point cloud.
 figure;
-figure3D = pcshow(ptCloud, "VerticalAxis", "y", "VerticalAxisDir", "down");
-title "\color{black} Point Cloud";
-movegui(figure3D, "center");
+figure3D = pcshow(ptCloud, 'VerticalAxis', 'y', 'VerticalAxisDir', 'down');
+movegui(figure3D, 'center');
 figure3D.OuterPosition = [0 0 1 1];
 
-xlabel "x (horizontal displacement in m)";
-ylabel "y (vertical displacement in m)";
-zlabel "z (point depth in m)";
+title '\color{black} Point Cloud';
+xlabel 'x (horizontal displacement in m)';
+ylabel 'y (vertical displacement in m)';
+zlabel 'z (point depth in m)';
 
 view(0, -90);
-set(gcf, "Color", "w");
-set(gca, "XColor", "k");
-set(gca, "YColor", "k");
-set(gca, "ZColor", "k");
+set(gcf, 'Color', 'w');
+set(gca, 'XColor', 'k');
+set(gca, 'YColor', 'k');
+set(gca, 'ZColor', 'k');
 
 colormap(flipud(jet));
 caxis(zlim(figure3D));

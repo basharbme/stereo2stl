@@ -75,8 +75,8 @@ clc;
    Script takes T = ~30s to execute.
 
 ```matlab
-loadingWaitbar = waitbar(0, "Loading");
-loadingWaitbar.Visible = "on";
+loadingWaitbar = waitbar(0, 'Loading');
+loadingWaitbar.Visible = 'on';
 ```
 
 ----
@@ -86,15 +86,15 @@ loadingWaitbar.Visible = "on";
 1. Load surf2stl if not installed.
 
 ```matlab
-if ~exist("surf2stl", "file")
-    if ~matlab.addons.isAddonEnabled("mpm")
-        error([                                                             ...
-            "Please install MPM as a MATLAB Addon.\n"                       ...
-            "<a href="""                                                    ...
-            "https://uk.mathworks.com/matlabcentral/fileexchange/54548"     ...
-            """>"                                                           ...
-            "mpm - File Exchange - MATLAB Central"                          ...
-            "</a>"                                                          ...
+if ~exist('surf2stl', 'file')
+    if ~matlab.addons.isAddonEnabled('mpm')
+        error([                                                         ...
+            'Please install MPM as a MATLAB Addon.\n'                   ...
+            '<a href="'                                                 ...
+            'https://uk.mathworks.com/matlabcentral/fileexchange/54548' ...
+            '">'                                                        ...
+            'mpm - File Exchange - MATLAB Central'                      ...
+            '</a>'                                                      ...
         ])
     else
         mpm install surf2stl;
@@ -106,18 +106,16 @@ end
    - `filePath`: path to current folder.
    - `stlPath`: name of point cloud STL.
    - `imageMinimum`: min. no of images in calib folder.
-   - `approxImageHeight`: Estimate of furthest scene height in mm.
-   - `squareWidth`: Checkerboard square width in mm.
-   - `ptCloudDensity`: Point density within squareWidth.
+   - `squareWidthMm`: Checkerboard square width in mm.
+   - `ptCloudDensity`: Point density within squareWidthMm.
    - `sGolayFiltOrder`: Savitsky-Golay extrapolation curve order.
    - `sGolayFiltFrameLen`: Savitsky-Golay sliding window point count.
 
 ```matlab
-filePath = fileparts(mfilename("fullpath"));
-stlPath = "point-cloud.stl";
+filePath = fileparts(mfilename('fullpath'));
+stlPath = 'point-cloud.stl';
 imageMinimum = 3;
-approxImageHeight = 2000;
-squareWidth = 50;
+squareWidthMm = 50;
 ptCloudDensity = 5;
 sGolayFiltOrder = 2;
 sGolayFiltFrameLen = 9;
@@ -132,7 +130,7 @@ Code based on MATLAB `rectifyStereoImages` code sample. [\[1\]][mathworks-help-r
 1. Delete STL if it exists.
 
 ```matlab
-if exist(fullfile(filePath, stlPath), "file")
+if exist(fullfile(filePath, stlPath), 'file')
    recycle on;
    delete(fullfile(filePath, stlPath));
 end
@@ -145,9 +143,9 @@ end
    - `calibRightImages`: Images from `./calibration/right` subfolder.
 
 ```matlab
-inputImages = imageDatastore(fullfile(filePath, "input"));
-calibLeftImages = imageDatastore(fullfile(filePath, "calibration", "left"));
-calibRightImages = imageDatastore(fullfile(filePath, "calibration", "right"));
+inputImages = imageDatastore(fullfile(filePath, 'input'));
+calibLeftImages = imageDatastore(fullfile(filePath, 'calibration', 'left'));
+calibRightImages = imageDatastore(fullfile(filePath, 'calibration', 'right'));
 waitbar(0.1, loadingWaitbar);
 ```
 
@@ -164,7 +162,7 @@ waitbar(0.2, loadingWaitbar);
 3. Calculate undistorted, real-world coordinates of checkerboard keypoints.
 
 ```matlab
-worldPoints = generateCheckerboardPoints(boardSize, squareWidth);
+worldPoints = generateCheckerboardPoints(boardSize, squareWidthMm);
 ```
 
 4. Read input images into MATLAB, and convert to grayscale.<br>
@@ -198,7 +196,7 @@ imageAmounts.R = size(calibRightImages.Files, 1);
 if imageAmounts.L ~= imageAmounts.R      % error #1
 
     e = sprintf(                                                        ...
-        "stereo2stl::ERR_MISMATCH_IMG_COUNT (L: %d, R: %d)",            ...
+        'stereo2stl::ERR_MISMATCH_IMG_COUNT (L: %d, R: %d)',            ...
         imageAmounts.L, imageAmounts.R                                  ...
     );
     errordlg(e);
@@ -206,14 +204,14 @@ if imageAmounts.L ~= imageAmounts.R      % error #1
 
 elseif imageAmounts.L < imageMinimum    % error #2
 
-    e = sprintf("stereo2stl::ERR_CALIB_IMG_INSUFFICIENT (%d)", imageAmounts.L);
+    e = sprintf('stereo2stl::ERR_CALIB_IMG_INSUFFICIENT (%d)', imageAmounts.L);
     errordlg(e);
     error(e);
 
 elseif ~isequal(imageSize, imageSize2)   % error #3
 
     e = sprintf(                                                        ...
-        "stereo2stl::ERR_MISMATCH_IMG_DIM (L: %dx%dpx, R: %dx%dpx)",    ...
+        'stereo2stl::ERR_MISMATCH_IMG_DIM (L: %dx%dpx, R: %dx%dpx)',    ...
         imageSize(1), imageSize(2), imageSize2(1), imageSize2(2)        ...
     );
     errordlg(e);
@@ -233,8 +231,8 @@ end
 ```matlab
 [stereoParams, ~, estimationErrors] = estimateCameraParameters(         ...
     imagePoints, worldPoints,                                           ...
-    "EstimateSkew", true,                                               ...
-    "EstimateTangentialDistortion", true                                ...
+    'EstimateSkew', true,                                               ...
+    'EstimateTangentialDistortion', true                                ...
 );
 waitbar(0.3, loadingWaitbar);
 ```
@@ -248,7 +246,7 @@ waitbar(0.3, loadingWaitbar);
 
 ```matlab
 figure;
-showExtrinsics(stereoParams, "CameraCentric");
+showExtrinsics(stereoParams, 'CameraCentric');
 waitbar(0.4, loadingWaitbar);
 figure;
 showReprojectionErrors(stereoParams);
@@ -266,7 +264,14 @@ waitbar(0.5, loadingWaitbar);
      - `OutputView`: OutputView crops the image to a rectangle, fitting inside the overlapping, curved 3D anaglyph. Default: `valid`.
 
 ```matlab
-[F1, F2] = rectifyStereoImages(I1, I2, stereoParams, "OutputView", "valid");
+[F1, F2] = rectifyStereoImages(I1, I2, stereoParams, 'OutputView', 'valid');
+pixelDensityMm = mean(                                                  ...
+    [                                                                   ...
+        stereoParams.CameraParameters1.IntrinsicMatrix(2, 1),           ...
+        stereoParams.CameraParameters2.IntrinsicMatrix(2, 1)            ...
+    ], 2                                                                ...
+);
+approxImageHeight = 0.5 * mean(size(F1, 2)) / pixelDensityMm;
 waitbar(0.6, loadingWaitbar);
 ```
 
@@ -276,7 +281,7 @@ waitbar(0.6, loadingWaitbar);
 ```matlab
 figure;
 imshow(stereoAnaglyph(F1, F2));
-title "Rectified Image";
+title 'Rectified Image';
 waitbar(0.7, loadingWaitbar);
 ```
 
@@ -291,7 +296,7 @@ Code based on MATLAB `disparitySGM` code sample. [\[4\]][mathworks-help-disparit
 1. Compute disparity map from stereo images (colormap of depth).
 
 ```matlab
-disparityMap = disparitySGM(F1, F2, "DisparityRange", [0, 80]);
+disparityMap = disparitySGM(F1, F2, 'DisparityRange', [0, 80]);
 waitbar(0.8, loadingWaitbar);
 ```
 
@@ -302,7 +307,7 @@ waitbar(0.8, loadingWaitbar);
 figure;
 imshow(disparityMap, [0, 80]);
 colormap jet;
-title "Disparity Map";
+title 'Disparity Map';
 colorbar;
 waitbar(0.9, loadingWaitbar);
 ```
@@ -326,7 +331,7 @@ rawPoints3D = double(rawPoints3D) ./ 1000;
 
 ```matlab
 pointsCache = struct;
-axesKeys = ["X", "Y", "Z"];
+axesKeys = ['X', 'Y', 'Z'];
 for i = 1:3
     k = char(axesKeys(i));
     p = rawPoints3D(:, :, i);
@@ -399,9 +404,9 @@ clearvars k p;
       Code adapted from StackOverflow. [\[6\]][stackoverflow-interpolate-savitskygolay]
 
 ```matlab
-gs = (1 / ptCloudDensity) * (squareWidth / 1000);
+gs = (1 / ptCloudDensity) * (squareWidthMm / 1000);
 
-I = scatteredInterpolant(pointsCache.X(:), pointsCache.Y(:), pointsCache.Z(:), "natural");
+I = scatteredInterpolant(pointsCache.X(:), pointsCache.Y(:), pointsCache.Z(:), 'natural');
 
 gridPoints = struct;
 intX = min(pointsCache.X(:)):gs:max(pointsCache.X(:));
@@ -434,20 +439,20 @@ ptCloud = pointCloud(points3D);
 
 ```matlab
 figure;
-figure3D = pcshow(ptCloud, "VerticalAxis", "y", "VerticalAxisDir", "down");
-title "\color{black} Point Cloud";
-movegui(figure3D, "center");
+figure3D = pcshow(ptCloud, 'VerticalAxis', 'y', 'VerticalAxisDir', 'down');
+title '\color{black} Point Cloud';
+movegui(figure3D, 'center');
 figure3D.OuterPosition = [0 0 1 1];
 
-xlabel "x (horizontal displacement in m)";
-ylabel "y (vertical displacement in m)";
-zlabel "z (point depth in m)";
+xlabel 'x (horizontal displacement in m)';
+ylabel 'y (vertical displacement in m)';
+zlabel 'z (point depth in m)';
 
 view(0, -90);
-set(gcf, "Color", "w");
-set(gca, "XColor", "k");
-set(gca, "YColor", "k");
-set(gca, "ZColor", "k");
+set(gcf, 'Color', 'w');
+set(gca, 'XColor', 'k');
+set(gca, 'YColor', 'k');
+set(gca, 'ZColor', 'k');
 
 colormap(flipud(jet));
 caxis(zlim(figure3D));
