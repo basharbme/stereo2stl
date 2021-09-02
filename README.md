@@ -265,13 +265,18 @@ waitbar(0.5, loadingWaitbar);
 
 ```matlab
 [F1, F2] = rectifyStereoImages(I1, I2, stereoParams, 'OutputView', 'valid');
-pixelDensityMm = mean(                                                  ...
-    [                                                                   ...
-        stereoParams.CameraParameters1.IntrinsicMatrix(2, 1),           ...
-        stereoParams.CameraParameters2.IntrinsicMatrix(2, 1)            ...
-    ], 2                                                                ...
+pixelDensityMm = mrdivide(                                              ...
+    mean([                                                              ...
+        stereoParams.CameraParameters1.FocalLength,                     ...
+        stereoParams.CameraParameters2.FocalLength                      ...
+    ], 2),                                                              ...
+    mean([                                                            ...
+        stereoParams.CameraParameters1.IntrinsicMatrix(1, 1),           ...
+        stereoParams.CameraParameters2.IntrinsicMatrix(1, 1)            ...
+    ], 2)                                                               ...
 );
-approxImageHeight = 0.5 * mean(size(F1, 2)) / pixelDensityMm;
+approxImageHeight = 2 * mean([size(F1, 1), size(F2, 1)], 2) / pixelDensityMm;
+approxImageWidth = 2 * mean([size(F1, 2), size(F2, 2)], 2) / pixelDensityMm;
 waitbar(0.6, loadingWaitbar);
 ```
 
@@ -296,7 +301,7 @@ Code based on MATLAB `disparitySGM` code sample. [\[4\]][mathworks-help-disparit
 1. Compute disparity map from stereo images (colormap of depth).
 
 ```matlab
-disparityMap = disparitySGM(F1, F2, 'DisparityRange', [0, 80]);
+disparityMap = disparitySGM(F1, F2, 'DisparityRange', [0, 64]);
 waitbar(0.8, loadingWaitbar);
 ```
 
@@ -305,7 +310,7 @@ waitbar(0.8, loadingWaitbar);
 
 ```matlab
 figure;
-imshow(disparityMap, [0, 80]);
+imshow(disparityMap, [0, 64]);
 colormap jet;
 title 'Disparity Map';
 colorbar;
@@ -360,10 +365,20 @@ limits = struct;
 cacheAxes = char(fieldnames(pointsCache));
 
 for i = 1:3
+    switch i
+        case 1
+            bound = approxImageWidth / 2;
+        case 2
+            bound = approxImageHeight / 2;
+        case 3
+            bound = mean([approxImageHeight, approxImageWidth], 2) / 2;
+        otherwise
+            bound = mean([approxImageHeight, approxImageWidth], 2) / 2;
+    end
     k = cacheAxes(i);
-    lim = [                                                             ...
-        checkerboardCentroid.(k) - approxImageHeight/1000,              ...
-        checkerboardCentroid.(k) + approxImageHeight/1000               ...
+    lim = [                                                 ...
+        checkerboardCentroid.(k) - bound/1000,              ...
+        checkerboardCentroid.(k) + bound/1000               ...
     ];
     limits.(k) = lim;
 
@@ -439,7 +454,7 @@ ptCloud = pointCloud(points3D);
 
 ```matlab
 figure;
-figure3D = pcshow(ptCloud, 'VerticalAxis', 'y', 'VerticalAxisDir', 'down');
+figure3D = pcshow(ptCloud, 'VerticalAxis', 'y', 'VerticalAxisDir', 'Down');
 title '\color{black} Point Cloud';
 movegui(figure3D, 'center');
 figure3D.OuterPosition = [0 0 1 1];
