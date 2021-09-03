@@ -494,7 +494,7 @@ surf2stl(stlPath, gridPoints.X, gridPoints.Y, gridPoints.Z);
 winopen(stlPath);
 ```
 
-> ![Output 4 - Windows 3D Viewer](./images/winopen-3d-viewer.png)
+> ![Output 4 - Windows Autodesk Fusion](./images/winopen-autodesk-fusion.png)
 
 ----
 
