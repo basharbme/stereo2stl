@@ -186,7 +186,7 @@ imageSize = [size(I1, 1), size(I1, 2)];
    2. below 4 images in `./calibration/left` & `./calibration/right`.
    3. mismatch in resolution of `./input` images.
 
-```matlab   
+```matlab
 imageSize2 = [size(I2, 1), size(I2, 2)];
 
 imageAmounts = struct;
@@ -454,7 +454,12 @@ ptCloud = pointCloud(points3D);
 
 ```matlab
 figure;
-figure3D = pcshow(ptCloud, 'VerticalAxis', 'y', 'VerticalAxisDir', 'Down');
+figure3D = pcshow(                                                      ...
+    ptCloud,                                                            ...
+    'VerticalAxis', 'y',                                                ...
+    'VerticalAxisDir', 'Down',                                          ...
+    'MarkerSize', 12                                                    ...
+);
 title '\color{black} Point Cloud';
 movegui(figure3D, 'center');
 figure3D.OuterPosition = [0 0 1 1];
