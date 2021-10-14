@@ -337,9 +337,9 @@ rawPoints3D = double(rawPoints3D) ./ 1000;
 ```matlab
 pointsCache = struct;
 axesKeys = ['X', 'Y', 'Z'];
-for i = 1:3
-    k = char(axesKeys(i));
-    p = rawPoints3D(:, :, i);
+for m = 1:3
+    k = char(axesKeys(m));
+    p = rawPoints3D(:, :, m);
     pointsCache.(k) = p;
 end
 clearvars p k;
@@ -364,8 +364,8 @@ checkerboardCentroid.Y = mean(pointsCache.Y(checkerboardIndex));
 limits = struct;
 cacheAxes = char(fieldnames(pointsCache));
 
-for i = 1:3
-    switch i
+for m = 1:3
+    switch m
         case 1
             bound = approxImageWidth / 2;
         case 2
@@ -375,7 +375,7 @@ for i = 1:3
         otherwise
             bound = mean([approxImageHeight, approxImageWidth], 2) / 2;
     end
-    k = cacheAxes(i);
+    k = cacheAxes(m);
     lim = [                                                 ...
         checkerboardCentroid.(k) - bound/1000,              ...
         checkerboardCentroid.(k) + bound/1000               ...
@@ -401,8 +401,8 @@ nanPoints = ( 0                                                         ...
     | isnan(pointsCache.Z)                                              ...
 );
 
-for i = 1:3
-    k = cacheAxes(i);
+for m = 1:3
+    k = cacheAxes(m);
     p = pointsCache.(k);
     p(nanPoints) = checkerboardCentroid.(k);
     pointsCache.(k) = p;
@@ -434,8 +434,8 @@ intZ2 = sgolayfilt(gridPoints.Z, sGolayFiltOrder, sGolayFiltFrameLen);
 gridPoints.Z = (intZ1.' + intZ2)/2;
 
 points3D = double.empty();
-for i = 1:3
-    points3D(:, :, i) = gridPoints.(cacheAxes(i));
+for m = 1:3
+    points3D(:, :, m) = gridPoints.(cacheAxes(m));
 end
 
 clearvars cacheAxes;
